@@ -10,13 +10,29 @@ QS::~QS() {
     clear();
 }
 
+/**
+ * sort()
+ *
+ * Sorts elements in a subarray.  After this function is called, every
+ * element between the given left and right indices is less than or
+ * equal to its successor.
+ *
+ * Does nothing if the array is empty, or if right is greater than left.
+ */
 void QS::sort(int left, int right) {
-    if (left < 0 || right > getSize() - 1 || left > right || right - left <= 1) {
+    if (left > right) {
         return;
     }
     
     int pivotIdx = medianOfThree(left, right);
+    if (pivotIdx == -1) {
+        return;
+    }
+    
     int midBound = partition(left, right, pivotIdx);
+    if (midBound == -1) {
+        return;
+    }
     
     sort(left, midBound - 1);
     sort(midBound + 1, right);
