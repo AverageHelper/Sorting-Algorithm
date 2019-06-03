@@ -1,12 +1,25 @@
 #include "QS.h"
 
 QS::QS() {
-    items = NULL;
+    items = new int[0];
     capacity = 0;
+    count = 0;
 }
 
 QS::~QS() {
     clear();
+}
+
+void QS::sort(int left, int right) {
+    if (left < 0 || right > getSize() - 1 || left > right || right - left <= 1) {
+        return;
+    }
+    
+    int pivotIdx = medianOfThree(left, right);
+    int midBound = partition(left, right, pivotIdx);
+    
+    sort(left, midBound - 1);
+    sort(midBound + 1, right);
 }
 
 /**
@@ -18,11 +31,9 @@ QS::~QS() {
  * Does nothing if the array is empty.
  */
 void QS::sortAll() {
-    if (getSize() == 0) {
-        return;
-    }
-    
-    
+    int leftBound = 0;
+    int rightBound = getSize() - 1;
+    sort(leftBound, rightBound);
 }
 
 /**
@@ -48,11 +59,33 @@ void QS::sortAll() {
  * @param right
  *         The right boundary for the subarray from which to find a pivot
  * @return
- *         The index of the pivot (middle index); -1 if provided with invalid input
+ *         The index of the pivot (middle index); -1 if provided with invalid input.
  */
 int QS::medianOfThree(int left, int right) {
-    // stub
-    return 0;
+    if (left < 0 || right > getSize() - 1 || left >= right) {
+        return -1;
+    }
+    
+    int middle = (left + right) / 2;
+    int tmpVal;
+    
+    if (items[middle] < items[left]) {
+        tmpVal = items[middle];
+        items[middle] = items[left];
+        items[left] = tmpVal;
+    }
+    if (items[right] < items[left]) {
+        tmpVal = items[right];
+        items[right] = items[left];
+        items[left] = tmpVal;
+    }
+    if (items[middle] > items[right]) {
+        tmpVal = items[middle];
+        items[middle] = items[right];
+        items[right] = tmpVal;
+    }
+    
+    return middle;
 }
 
 /**
@@ -76,11 +109,51 @@ int QS::medianOfThree(int left, int right) {
  *         The index of the pivot in the subarray
  * @return
  *         The pivot's ending index after the partition completes; -1 if
- *          provided with bad input
+ *          provided with bad input.
  */
 int QS::partition(int left, int right, int pivotIndex) {
-    // stub
-    return 0;
+    // Check for invalid arguments
+    if (getSize() == 0 || left < 0 || right >= getSize() || left >= right || pivotIndex < left || pivotIndex > right) {
+        return -1;
+    }
+    
+    // Save pivot value
+    int pivotVal = items[pivotIndex];
+    
+    // Swap the pivot with leftmost
+    int tmpVal = items[left];
+    items[left] = items[pivotIndex];
+    items[pivotIndex] = tmpVal;
+    
+    // Left and right indices
+    int leftIdx = left + 1;
+    int rightIdx = right;
+    
+    do {
+        // Increment left until we're greater than the pivot, or hit right boundary.
+        while (items[leftIdx] <= pivotVal && leftIdx < right) {
+            leftIdx += 1;
+        }
+        
+        // Decrement right until we're less than or equal to the pivot, or hit low boundary.
+        while (items[rightIdx] > pivotVal && rightIdx > left) {
+            rightIdx -= 1;
+        }
+        
+        // If left < right, swap them.
+        if (leftIdx < rightIdx) {
+            tmpVal = items[leftIdx];
+            items[leftIdx] = items[rightIdx];
+            items[rightIdx] = tmpVal;
+        }
+
+    } while (leftIdx < rightIdx);
+    
+    tmpVal = items[left];
+    items[left] = items[rightIdx];
+    items[rightIdx] = tmpVal;
+    
+    return rightIdx;
 }
 
 /**
@@ -112,7 +185,8 @@ string QS::getArray() const {
  * Returns the number of elements which have been added to the array.
  */
 int QS::getSize() const {
-    return sizeof(items) / sizeof(*items);
+    return count;
+//    return sizeof(items) / sizeof(*items);
 }
 
 /**
@@ -132,6 +206,7 @@ bool QS::addToArray(int value) {
     }
     
     items[endIndex] = value;
+    count += 1;
     
     return true;
 }
@@ -162,6 +237,7 @@ bool QS::createArray(int capacity) {
  * Resets the array to an empty or NULL state.
  */
 void QS::clear() {
+    if (getSize() == 0) { return; }
     delete[] items;
-    capacity = 0;
+    count = 0;
 }

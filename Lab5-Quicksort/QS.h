@@ -8,6 +8,8 @@ class QS: public QSInterface {
 private:
     int* items;
     int capacity;
+    int count;
+    void sort(int left, int right);
     
 public:
     QS();
