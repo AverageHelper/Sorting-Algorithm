@@ -1,7 +1,7 @@
 #include "QS.h"
 
 QS::QS() {
-    items = new int[0];
+    items = NULL;
     capacity = 0;
     count = 0;
 }
@@ -246,6 +246,10 @@ bool QS::createArray(int capacity) {
     items = new int[capacity];
     this->capacity = capacity;
     
+    for (int i = 0; i < capacity; i++) {
+        items[i] = 0;
+    }
+    
     return true;
 }
 
@@ -253,7 +257,9 @@ bool QS::createArray(int capacity) {
  * Resets the array to an empty or NULL state.
  */
 void QS::clear() {
-    if (getSize() == 0) { return; }
+    if (capacity == 0) { return; }
     delete[] items;
+    items = NULL;
     count = 0;
+    capacity = 0;
 }
